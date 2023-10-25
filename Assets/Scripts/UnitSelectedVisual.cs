@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class UnitSelectedVisual : MonoBehaviour
 {
+
     [SerializeField] private Unit unit;
+
     private MeshRenderer meshRenderer;
+
     private void Awake()
     {
         meshRenderer = GetComponent<MeshRenderer>();
@@ -15,11 +18,14 @@ public class UnitSelectedVisual : MonoBehaviour
     private void Start()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
+        UpdateVisual();
     }
-    private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs e)
+
+    private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs empty)
     {
         UpdateVisual();
     }
+
     private void UpdateVisual()
     {
         if (UnitActionSystem.Instance.GetSelectedUnit() == unit)
