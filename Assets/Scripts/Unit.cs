@@ -10,7 +10,10 @@ public class Unit : MonoBehaviour
     [SerializeField] private bool isEnemy;
 
     public static event EventHandler OnAnyActionPointsChanged;
+    public static event EventHandler OnAnyUnitSpawned;
+    public static event EventHandler OnAnyUnitDead;
 
+    private HealthSystem healthSystem;
     private GridPosition gridPosition;
     private MoveAction moveAction;
     private SpinAction spinAction;
@@ -22,6 +25,7 @@ public class Unit : MonoBehaviour
         moveAction = GetComponent<MoveAction>();
         spinAction = GetComponent<SpinAction>();
         baseActionArray = GetComponents<BaseAction>();
+        healthSystem = GetComponent<HealthSystem>();
     }
 
     private void Start()
@@ -29,17 +33,19 @@ public class Unit : MonoBehaviour
         gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(gridPosition, this);
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        healthSystem.OnDead += HealthSystem_OnDead;
+        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
+
     }
 
     private void Update()
     {
-
-
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         if (newGridPosition != gridPosition)
         {
-            LevelGrid.Instance.UnitMovedGridPosition(this, gridPosition, newGridPosition);
+            GridPosition oldGridPosition = gridPosition;
             gridPosition = newGridPosition;
+            LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
         }
     }
 
@@ -68,9 +74,9 @@ public class Unit : MonoBehaviour
     {
         return transform.position;
     }
-    public void Damage()
+    public void Damage(int damageAmount)
     {
-        Debug.Log(transform + " has been damaged");
+        healthSystem.Damage(damageAmount);
     }
     public bool TrySpendActionPointsToTakeAction(BaseAction baseAction)
     {
@@ -112,6 +118,12 @@ public class Unit : MonoBehaviour
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
 
+    }
+    private void HealthSystem_OnDead(object sender, EventArgs e)
+    {
+        LevelGrid.Instance.RemoveUnitAtGridPosition(gridPosition, this);
+        Destroy(gameObject);
+        OnAnyUnitDead?.Invoke(this, EventArgs.Empty);
     }
 
 }

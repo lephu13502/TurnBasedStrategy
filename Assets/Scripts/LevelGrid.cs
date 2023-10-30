@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,11 @@ using UnityEngine;
 public class LevelGrid : MonoBehaviour
 {
     public static LevelGrid Instance { get; private set; }
+
     [SerializeField] private Transform gridDebugObjectPrefab;
+
+    public event EventHandler OnAnyUnitMovedGridPosition;
+
     private GridSystem gridSystem;
     private void Awake()
     {
@@ -38,6 +43,7 @@ public class LevelGrid : MonoBehaviour
     {
         RemoveUnitAtGridPosition(oldGridPosition, unit);
         AddUnitAtGridPosition(newGridPosition, unit);
+        OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
     }
     public GridPosition GetGridPosition(Vector3 worldPosition)
     {

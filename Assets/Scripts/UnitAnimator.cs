@@ -23,11 +23,11 @@ public class UnitAnimator : MonoBehaviour
     }
     private void MoveAction_OnStartMoving(object sender, EventArgs e)
     {
-        animator.SetBool("isMoving", true);
+        animator.SetBool("IsWalking", true);
     }
     private void MoveAction_OnStopMoving(object sender, EventArgs e)
     {
-        animator.SetBool("isMoving", false);
+        animator.SetBool("IsWalking", false);
     }
     private void ShootAction_OnShoot(object sender, ShootAction.OnShootEventArgs e)
     {
