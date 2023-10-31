@@ -15,15 +15,11 @@ public class Unit : MonoBehaviour
 
     private HealthSystem healthSystem;
     private GridPosition gridPosition;
-    private MoveAction moveAction;
-    private SpinAction spinAction;
     private BaseAction[] baseActionArray;
     private int actionPoints = ACTION_POINTS_MAX;
 
     private void Awake()
     {
-        moveAction = GetComponent<MoveAction>();
-        spinAction = GetComponent<SpinAction>();
         baseActionArray = GetComponents<BaseAction>();
         healthSystem = GetComponent<HealthSystem>();
     }
@@ -48,14 +44,16 @@ public class Unit : MonoBehaviour
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
         }
     }
-
-    public MoveAction GetMoveAction()
+    public T GetAction<T>() where T : BaseAction
     {
-        return moveAction;
-    }
-    public SpinAction GetSpinAction()
-    {
-        return spinAction;
+        foreach (BaseAction baseAction in baseActionArray)
+        {
+            if (baseAction is T)
+            {
+                return (T)baseAction;
+            }
+        }
+        return null;
     }
 
     public GridPosition GetGridPosition()
@@ -73,6 +71,10 @@ public class Unit : MonoBehaviour
     public Vector3 GetWorldPosition()
     {
         return transform.position;
+    }
+    public float GetHealthNormalized()
+    {
+        return healthSystem.GetHealthNormalized();
     }
     public void Damage(int damageAmount)
     {

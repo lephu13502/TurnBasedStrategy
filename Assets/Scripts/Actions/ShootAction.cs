@@ -19,6 +19,7 @@ public class ShootAction : BaseAction
         Cooloff,
     }
 
+    [SerializeField] private LayerMask obstaclesLayerMask;
     private State state;
     private int maxShootDistance = 7;
     private float stateTimer;
@@ -85,10 +86,17 @@ public class ShootAction : BaseAction
     {
         return "Shoot";
     }
+
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        List<GridPosition> validActionGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = unit.GetGridPosition();
+        return GetValidActionGridPositionList(unit.GetGridPosition());
+    }
+
+    public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
+    {
+        List<GridPosition> validActionGridPositionList = new List<GridPosition>();
+
         for (int x = -maxShootDistance; x <= maxShootDistance; x++)
         {
             for (int z = -maxShootDistance; z <= maxShootDistance; z++)
@@ -113,6 +121,13 @@ public class ShootAction : BaseAction
 
                 Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
                 if (targetUnit.IsEnemy() == unit.IsEnemy())
+                {
+                    continue;
+                }
+                Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
+                Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+                float unitShoulderHeight = 1.7f;
+                if (Physics.Raycast(unitWorldPosition + Vector3.up * unitShoulderHeight, shootDir, Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()), obstaclesLayerMask))
                 {
                     continue;
                 }
@@ -141,5 +156,19 @@ public class ShootAction : BaseAction
     public int GetMaxShootDistance()
     {
         return maxShootDistance;
+    }
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = 100 + Mathf.RoundToInt((1 - targetUnit.GetHealthNormalized()) * 100f),
+        };
+    }
+    public int GetTargetCountAtPosition(GridPosition gridPosition)
+    {
+        return GetValidActionGridPositionList(gridPosition).Count;
     }
 }
