@@ -94,6 +94,23 @@ public class GridSystemVisual : MonoBehaviour
         }
         ShowGridPositionList(gridPositionList, gridVisualType);
     }
+    private void ShowGridPostionRangeSquare(GridPosition gridPosition, int range, GridVisualType gridVisualType)
+    {
+        List<GridPosition> gridPositionList = new List<GridPosition>();
+        for (int x = -range; x <= range; x++)
+        {
+            for (int z = -range; z <= range; z++)
+            {
+                GridPosition testGridPosition = gridPosition + new GridPosition(x, z);
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                gridPositionList.Add(testGridPosition);
+            }
+        }
+        ShowGridPositionList(gridPositionList, gridVisualType);
+    }
     private void UpdateGridVisual()
     {
         HideAllGridPosition();
@@ -110,6 +127,16 @@ public class GridSystemVisual : MonoBehaviour
             case ShootAction shootAction:
                 gridVisualType = GridVisualType.Red;
                 ShowGridPostionRange(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
+                break;
+            case SwordAction swordAction:
+                gridVisualType = GridVisualType.Red;
+                ShowGridPostionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                break;
+            case GrenadeAction grenadeAction:
+                gridVisualType = GridVisualType.Yellow;
+                break;
+            case InteractAction interactAction:
+                gridVisualType = GridVisualType.Blue;
                 break;
             case SpinAction spinAction:
                 gridVisualType = GridVisualType.Blue;
