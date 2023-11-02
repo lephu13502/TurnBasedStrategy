@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Door : MonoBehaviour
+public class Door : MonoBehaviour, IInteractable
 {
     [SerializeField] private bool isOpen;
 
     private GridPosition gridPosition;
     private Animator animator;
-    private Action onInteractComplete;
+    private Action onInteractionComplete;
     private float timer;
     private bool isActive;
 
@@ -21,7 +21,7 @@ public class Door : MonoBehaviour
     private void Start()
     {
         gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
-        LevelGrid.Instance.SetDoorAtGridPosition(gridPosition, this);
+        LevelGrid.Instance.SetInteractableAtGridPosition(gridPosition, this);
         if (isOpen)
         {
             OpenDoor();
@@ -42,13 +42,13 @@ public class Door : MonoBehaviour
         if (timer <= 0f)
         {
             isActive = false;
-            onInteractComplete();
+            onInteractionComplete();
         }
     }
 
-    public void Interact(Action onInteractComplete)
+    public void Interact(Action onInteractionComplete)
     {
-        this.onInteractComplete = onInteractComplete;
+        this.onInteractionComplete = onInteractionComplete;
         isActive = true;
         timer = 0.5f;
         if (isOpen)

@@ -52,5 +52,6 @@
         "temp/":true,
         "Temp/":true
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "dotnet.preferCSharpExtension": true
 }
