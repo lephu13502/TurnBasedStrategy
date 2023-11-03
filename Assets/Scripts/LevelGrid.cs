@@ -12,7 +12,14 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private int height;
     [SerializeField] private float cellSize;
 
-    public event EventHandler OnAnyUnitMovedGridPosition;
+    public event EventHandler<OnAnyUnitMovedGridPositionEventArgs> OnAnyUnitMovedGridPosition;
+    public class OnAnyUnitMovedGridPositionEventArgs : EventArgs
+    {
+        public Unit unit;
+        public GridPosition fromGridPosition;
+        public GridPosition toGridPosition;
+    }
+
 
     private GridSystem<GridObject> gridSystem;
     private void Awake()
@@ -50,7 +57,13 @@ public class LevelGrid : MonoBehaviour
     {
         RemoveUnitAtGridPosition(oldGridPosition, unit);
         AddUnitAtGridPosition(newGridPosition, unit);
-        OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
+        OnAnyUnitMovedGridPosition?.Invoke(this, new OnAnyUnitMovedGridPositionEventArgs
+        {
+            unit = unit,
+            fromGridPosition = oldGridPosition,
+            toGridPosition = newGridPosition,
+        });
+
     }
     public GridPosition GetGridPosition(Vector3 worldPosition)
     {
@@ -92,4 +105,10 @@ public class LevelGrid : MonoBehaviour
         GridObject gridObject = gridSystem.GetGridObject(gridPosition);
         gridObject.SetInteractable(interactable);
     }
+    public void ClearInteractableAtGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = gridSystem.GetGridObject(gridPosition);
+        gridObject.ClearInteractable();
+    }
+
 }
